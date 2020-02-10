@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import signals
 
 
 class Pasazerowie(models.Model):
@@ -7,7 +8,7 @@ class Pasazerowie(models.Model):
     nazwisko = models.CharField(max_length=20)
 
     def __str__(self):
-        return self.imie + self.nazwisko
+        return str(self.imie) + " " + str(self.nazwisko)
 
 class Rezerwacje(models.Model):
     pasazer = models.ForeignKey(Pasazerowie, on_delete=models.CASCADE)
@@ -33,7 +34,7 @@ class Samoloty(models.Model):
     ilosc_miejsc = models.IntegerField()
 
     def __str__(self):
-        return "id=" + str(self.id)
+        return "Samolot nr " + str(self.id) + " ilosc miejsc - " + str(self.ilosc_miejsc)
 
 class Loty(models.Model):
     data_odlotu = models.DateTimeField()
@@ -49,11 +50,11 @@ class Loty(models.Model):
 class Siedzenia(models.Model):
     samolot = models.ForeignKey(Samoloty, on_delete=models.CASCADE)
     lot = models.ForeignKey(Loty, on_delete=models.CASCADE)
-    pasazer = models.ForeignKey(Pasazerowie, on_delete=models.CASCADE)
+    pasazer = models.ForeignKey(Pasazerowie, on_delete=models.CASCADE, default='', null=True, blank=True)
     miejsce = models.IntegerField()
 
     def __str__(self):
-        return self.numer_lotu + " " + str(self.miejsce)
+        return str(self.lot) + " " + str(self.miejsce)
 
 
 class Wymagania(models.Model):
@@ -68,4 +69,33 @@ class MiejscaSpecjalne(models.Model):
     siedzenie = models.ForeignKey(Siedzenia, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.siedzenie + self.wymaganie
+        return str(self.siedzenie) + str(self.wymaganie)
+
+
+'''funkcje'''
+
+
+def siedzenia_dla_lotu(sender, instance, created, **kwargs):
+    if created:
+        for x in range(1, instance.samolot.ilosc_miejsc + 1):
+            siedzonko = Siedzenia(samolot=instance.samolot, lot=instance, miejsce=x)
+            siedzonko.save()
+            if x < 5:
+                wymaganie = Wymagania.objects.get(pk=3)
+                miejsce_specjalne = MiejscaSpecjalne(siedzenie=siedzonko, wymaganie=wymaganie)
+                miejsce_specjalne.save()
+            if x % 5 == 0:
+                wymaganie1 = Wymagania.objects.get(pk=4)
+                miejsce_specjalne1 = MiejscaSpecjalne(siedzenie=siedzonko, wymaganie=wymaganie1)
+                miejsce_specjalne1.save()
+            if x > 15:
+                wymaganie2 = Wymagania.objects.get(pk=1)
+                miejsce_specjalne2 = MiejscaSpecjalne(siedzenie=siedzonko, wymaganie=wymaganie2)
+                miejsce_specjalne2.save()
+            if x % 4:
+                wymaganie3 = Wymagania.objects.get(pk=2)
+                miejsce_specjalne3 = MiejscaSpecjalne(siedzenie=siedzonko, wymaganie=wymaganie3)
+                miejsce_specjalne3.save()
+
+
+signals.post_save.connect(siedzenia_dla_lotu, sender=Loty, weak=False, dispatch_uid='models.siedzenia_dla_lotu')
