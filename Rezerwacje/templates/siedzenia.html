@@ -1,5 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>{{pasazer}}</p>
+<p>Rezerwacja dla {{aktualny_pasazer}} (id - {{aktualny_pasazer.id}}) </p>
+<p>Wybierz siedzenie</p>
+<form action="/pasazer" method="GET">
+    <button type="submit">Powrót</button>
+</form>
+<table>
+    <tr>
+        <td> Wybierz</td>
+    </tr>
+</table>
+
 {% endblock %}

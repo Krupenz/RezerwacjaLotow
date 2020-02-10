@@ -3,7 +3,7 @@ from django.db.models import signals
 
 
 class Pasazerowie(models.Model):
-    pesel = models.CharField(max_length=11)
+    pesel = models.CharField(max_length=11, unique=True)
     imie = models.CharField(max_length=20)
     nazwisko = models.CharField(max_length=20)
 

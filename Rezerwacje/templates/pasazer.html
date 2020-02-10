@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 m-auto">
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+                <label>Imie:</label> <br> <input type="text" id="imie" name="imie" required="required"
+                                                 pattern="[a-zA-Z]{1,20}" title="Imię to ciąg znaków A-Z do 20 znaków!"><br>
+                <label>Nazwisko:</label> <br> <input type="text" id="nazwisko" name="nazwisko" required="required"
+                                                     pattern="[a-zA-Z]{1,20}"
+                                                     title="Nazwisko to ciąg znaków A-Z do 20 znaków!"><br>
+                <label>PESEL:</label> <br> <input type="text" id="pesel" name="pesel" required="required"
+                                                  pattern="^\d{11}$" title="Pesel to ciąg 11 cyfr!"><br> <br>
+                {{error}}
+                <select name="lot">
+                    {% for lot in loty%}
+                    <option>{{lot}}</option>
+                    {%endfor%}
+                </select> <br> <br>
+                <input type="submit" value="Wybierz miejsce">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
